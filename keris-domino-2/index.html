@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Domino 4 Pemain</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .game-controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-new {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-skip {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .game-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .player-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .player-active {
+            border-color: #28a745;
+            background-color: #f8fff8;
+        }
+
+        .player-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .domino-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .domino {
+            width: 60px;
+            height: 120px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            background-color: white;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .domino:hover {
+            transform: translateY(-5px);
+        }
+
+        .domino-half {
+            height: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            border-bottom: 1px solid #333;
+        }
+
+        .domino-half:last-child {
+            border-bottom: none;
+        }
+
+        .domino-ai {
+            background-color: #ddd;
+        }
+
+        .rotate-btn {
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: none;
+        }
+
+        .domino:hover .rotate-btn {
+            display: block;
+        }
+
+        .game-board {
+            min-height: 150px;
+            border: 2px solid #666;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #e9ecef;
+        }
+
+        .status-message {
+            font-size: 18px;
+            color: #007bff;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .score-display {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px 0;
+        }
+
+        .score-item {
+            text-align: center;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            min-width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-controls">
+            <button class="btn btn-new" onclick="mulaPemainan()">Permainan Baru</button>
+            <button class="btn btn-skip" onclick="skipGiliran()" id="skipBtn">Skip Giliran</button>
+        </div>
+
+        <div class="game-info">
+            <div class="status-message" id="statusMessage">Sila mula permainan baru</div>
+            <div class="score-display">
+                <div class="score-item">
+                    Skip: <span id="skipCount">0</span>
+                </div>
+                <div class="score-item">
+                    Giliran: <span id="currentTurn">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="player-section" id="player2Section">
+            <div class="player-name">Pemain 2</div>
+            <div class="domino-container" id="player2Hand"></div>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <div class="domino-container" id="boardDominoes"></div>
+        </div>
+
+        <div class="player-section" id="player1Section">
+            <div class="player-name">Pemain 1 (Anda)</div>
+            <div class="domino-container" id="player1Hand"></div>
+        </div>
+
+        <div class="player-section" id="player3Section">
+            <div class="player-name">Pemain 3</div>
+            <div class="domino-container" id="player3Hand"></div>
+        </div>
+
+        <div class="player-section" id="player4Section">
+            <div class="player-name">Pemain 4</div>
+            <div class="domino-container" id="player4Hand"></div>
+        </div>
+    </div>
+    </body>
+<script>
+// Variables Global
+let dominoes = [];
+let players = {
+    1: [], // Pemain (User)
+    2: [], // AI 1
+    3: [], // AI 2
+    4: []  // AI 3
+};
+let boardDominoes = [];
+let currentPlayer = 1;
+let gameActive = false;
+let skipCount = 0;
+let consecutiveSkips = 0;
+
+// Fungsi Permainan Asas
+function buatDomino() {
+    dominoes = [];
+    for (let i = 0; i <= 6; i++) {
+        for (let j = i; j <= 6; j++) {
+            dominoes.push({
+                atas: i,
+                bawah: j,
+                isRotated: false,
+                nilai: i + j
+            });
+        }
+    }
+}
+
+function kocokDomino() {
+    for (let i = dominoes.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [dominoes[i], dominoes[j]] = [dominoes[j], dominoes[i]];
+    }
+}
+
+function agihDomino() {
+    for (let i = 1; i <= 4; i++) {
+        players[i] = dominoes.slice((i-1)*7, i*7);
+    }
+    dominoes = dominoes.slice(28);
+}
+
+// Fungsi UI
+function createDominoElement(domino, index, isAI = false) {
+    const dominoDiv = document.createElement('div');
+    dominoDiv.className = `domino ${isAI ? 'domino-ai' : ''}`;
+    
+    if (!isAI) {
+        dominoDiv.onclick = () => mainDomino(index);
+        
+        const rotateBtn = document.createElement('button');
+        rotateBtn.className = 'rotate-btn';
+        rotateBtn.innerHTML = '↻';
+        rotateBtn.onclick = (e) => {
+            e.stopPropagation();
+            putarDomino(index);
+        };
+        dominoDiv.appendChild(rotateBtn);
+    }
+
+    const topHalf = document.createElement('div');
+    topHalf.className = 'domino-half';
+    topHalf.textContent = isAI ? '?' : domino.atas;
+
+    const bottomHalf = document.createElement('div');
+    bottomHalf.className = 'domino-half';
+    bottomHalf.textContent = isAI ? '?' : domino.bawah;
+
+    dominoDiv.appendChild(topHalf);
+    dominoDiv.appendChild(bottomHalf);
+
+    return dominoDiv;
+}
+
+function updatePaparan() {
+    // Update player hands
+    for (let i = 1; i <= 4; i++) {
+        const handContainer = document.getElementById(`player${i}Hand`);
+        handContainer.innerHTML = '';
+        
+        players[i].forEach((domino, index) => {
+            handContainer.appendChild(
+                createDominoElement(domino, index, i !== 1)
+            );
+        });
+
+        // Update active player highlighting
+        const section = document.getElementById(`player${i}Section`);
+        section.className = `player-section ${currentPlayer === i ? 'player-active' : ''}`;
+    }
+
+    // Update game board
+    const boardContainer = document.getElementById('boardDominoes');
+    boardContainer.innerHTML = '';
+    boardDominoes.forEach((domino, index) => {
+        boardContainer.appendChild(
+            createDominoElement(domino, index, false)
+        );
+    });
+
+    // Update status message
+    const statusMessage = document.getElementById('statusMessage');
+    statusMessage.textContent = gameActive 
+        ? `Giliran Pemain ${currentPlayer}${currentPlayer === 1 ? ' (Anda)' : ''}`
+        : 'Sila mula permainan baru';
+
+    // Update current turn and skip count
+    document.getElementById('currentTurn').textContent = currentPlayer;
+    document.getElementById('skipCount').textContent = consecutiveSkips;
+
+    // Update skip button state
+    const skipBtn = document.getElementById('skipBtn');
+    skipBtn.disabled = !gameActive || currentPlayer !== 1;
+}
+
+// Fungsi Permainan Utama
+function mulaPemainan() {
+    gameActive = true;
+    skipCount = 0;
+    consecutiveSkips = 0;
+    currentPlayer = 1;
+    boardDominoes = [];
+    
+    buatDomino();
+    kocokDomino();
+    agihDomino();
+    updatePaparan();
+}// Sambung script sebelumnya...
+
+function bolehMain(domino) {
+    if (boardDominoes.length === 0) return true;
+    
+    const firstDomino = boardDominoes[0];
+    const lastDomino = boardDominoes[boardDominoes.length - 1];
+    
+    return (domino.atas === firstDomino.atas || 
+            domino.atas === lastDomino.bawah || 
+            domino.bawah === firstDomino.atas || 
+            domino.bawah === lastDomino.bawah);
+}
+
+function putarDomino(index) {
+    if (!gameActive || currentPlayer !== 1) return;
+    
+    const domino = players[1][index];
+    const temp = domino.atas;
+    domino.atas = domino.bawah;
+    domino.bawah = temp;
+    domino.isRotated = !domino.isRotated;
+    updatePaparan();
+}
+
+function mainDomino(index) {
+    if (!gameActive || currentPlayer !== 1) return;
+    
+    const domino = players[1][index];
+    if (bolehMain(domino)) {
+        // Main domino
+        players[1].splice(index, 1);
+        boardDominoes.push(domino);
+        consecutiveSkips = 0;
+
+        // Periksa menang
+        if (players[1].length === 0) {
+            tamatPermainan(1);
+            return;
+        }
+
+        // Giliran seterusnya
+        nextPlayer();
+        updatePaparan();
+        if (currentPlayer !== 1) {
+            setTimeout(giliranAI, 1000);
+        }
+    } else {
+        alert('Domino ini tidak boleh dimainkan! Cuba putar domino atau pilih domino lain.');
+    }
+}
+
+function skipGiliran() {
+    if (!gameActive || currentPlayer !== 1) return;
+
+    // Periksa jika ada domino yang boleh dimain
+    const adaDominoValid = players[1].some(domino => bolehMain(domino));
+    if (adaDominoValid) {
+        alert("Anda masih ada domino yang boleh dimainkan!");
+        return;
+    }
+
+    consecutiveSkips++;
+    if (consecutiveSkips >= 4) {
+        tamatPermainan(0); // 0 bermaksud tiada pemenang
+        return;
+    }
+
+    nextPlayer();
+    updatePaparan();
+    setTimeout(giliranAI, 1000);
+}
+
+function giliranAI() {
+    if (!gameActive) return;
+
+    const currentHand = players[currentPlayer];
+    let mainedDomino = false;
+
+    // Cuba main domino
+    for (let i = 0; i < currentHand.length; i++) {
+        if (bolehMain(currentHand[i])) {
+            const domino = currentHand[i];
+            currentHand.splice(i, 1);
+            boardDominoes.push(domino);
+            mainedDomino = true;
+            consecutiveSkips = 0;
+            
+            // Periksa menang
+            if (currentHand.length === 0) {
+                tamatPermainan(currentPlayer);
+                return;
+            }
+            break;
+        }
+    }
+
+    // Jika tak boleh main
+    if (!mainedDomino) {
+        consecutiveSkips++;
+        if (consecutiveSkips >= 4) {
+            tamatPermainan(0);
+            return;
+        }
+    }
+
+    nextPlayer();
+    updatePaparan();
+
+    // Teruskan ke AI seterusnya jika bukan giliran pemain
+    if (currentPlayer !== 1 && gameActive) {
+        setTimeout(giliranAI, 1000);
+    }
+}
+
+function nextPlayer() {
+    currentPlayer = currentPlayer % 4 + 1;
+}
+
+function kiraSkor(playerHand) {
+    return playerHand.reduce((total, domino) => total + domino.atas + domino.bawah, 0);
+}
+
+function tamatPermainan(pemenang) {
+    gameActive = false;
+    let mesej = '';
+
+    if (pemenang === 0) {
+        mesej = "Permainan tamat kerana semua pemain skip!\n\n";
+    } else {
+        mesej = `Pemain ${pemenang}${pemenang === 1 ? ' (Anda)' : ''} Menang!\n\n`;
+    }
+
+    // Kira skor akhir
+    mesej += "Skor Akhir:\n";
+    for (let i = 1; i <= 4; i++) {
+        const skor = kiraSkor(players[i]);
+        mesej += `Pemain ${i}${i === 1 ? ' (Anda)' : ''}: ${skor} mata\n`;
+    }
+
+    alert(mesej);
+    updatePaparan();
+}
+
+// Tambah event listener untuk butang
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('skipBtn').disabled = true;
+});
+</script>
+</body>
+</html>

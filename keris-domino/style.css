@@ -1,0 +1,36 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+#game-board {
+    border: 2px solid black;
+    min-height: 100px;
+    margin: 20px auto;
+    padding: 10px;
+    width: 80%;
+    background-color: #f8f8f8;
+}
+
+#player-hand {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.tile {
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+    border: 1px solid black;
+    text-align: center;
+    line-height: 25px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.tile:hover {
+    background-color: lightgray;
+}
