@@ -1,0 +1,164 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.game-controls {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.btn-new {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-skip {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.game-info {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.player-section {
+    margin: 20px 0;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    position: relative;
+}
+
+.player-active {
+    border-color: #28a745;
+    background-color: #f8fff8;
+}
+
+.player-name {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.domino-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.domino {
+    width: 60px;
+    height: 120px;
+    border: 2px solid #333;
+    border-radius: 5px;
+    background-color: white;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.domino:hover {
+    transform: translateY(-5px);
+}
+
+.domino-half {
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    border-bottom: 1px solid #333;
+}
+
+.domino-half:last-child {
+    border-bottom: none;
+}
+
+.domino-ai {
+    background-color: #ddd;
+}
+
+.rotate-btn {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: none;
+}
+
+.domino:hover .rotate-btn {
+    display: block;
+}
+
+.game-board {
+    min-height: 150px;
+    border: 2px solid #666;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    background-color: #e9ecef;
+}
+
+.status-message {
+    font-size: 18px;
+    color: #007bff;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.score-display {
+    display: flex;
+    justify-content: space-around;
+    margin: 10px 0;
+}
+
+.score-item {
+    text-align: center;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    min-width: 100px;
+}

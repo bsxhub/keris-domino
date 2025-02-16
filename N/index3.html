@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Domino 4 Pemain</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .domino {
+            width: 60px;
+            height: 120px;
+            border: 2px solid black;
+            display: inline-block;
+            margin: 5px;
+            background: white;
+            cursor: pointer;
+            position: relative;
+        }
+        .domino-number {
+            height: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            border-bottom: 1px solid black;
+        }
+        .rotate-btn {
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            display: none;
+        }
+        .domino:hover .rotate-btn {
+            display: block;
+        }
+        .player-hand {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin: 10px;
+            min-height: 130px;
+            width: 80%;
+        }
+        .board {
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 150px;
+            width: 80%;
+        }
+        .status {
+            font-size: 20px;
+            margin: 10px;
+            color: blue;
+        }
+        .player-info {
+            font-weight: bold;
+            margin: 5px;
+        }
+        .active-player {
+            color: green;
+        }
+        .player-container {
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button onclick="mulaPemainan()">Mula Permainan Baru</button>
+        <div class="status" id="status">Klik Mula Permainan Baru untuk bermain</div>
+
+        <div class="player-container">
+            <div class="player-info" id="player1-info">Pemain 1 (Anda)</div>
+            <div class="player-hand" id="player1-hand"></div>
+        </div>
+
+        <div class="player-container">
+            <div class="player-info" id="player2-info">Pemain 2</div>
+            <div class="player-hand" id="player2-hand"></div>
+        </div>
+
+        <div class="board" id="game-board"></div>
+
+        <div class="player-container">
+            <div class="player-info" id="player3-info">Pemain 3</div>
+            <div class="player-hand" id="player3-hand"></div>
+        </div>
+
+        <div class="player-container">
+            <div class="player-info" id="player4-info">Pemain 4</div>
+            <div class="player-hand" id="player4-hand"></div>
+        </div>
+    </div>
+
+    <script>
+        let dominoes = [];
+        let players = {
+            1: [], // Pemain manusia
+            2: [], // AI 1
+            3: [], // AI 2
+            4: []  // AI 3
+        };
+        let boardDominoes = [];
+        let currentPlayer = 1;
+
+        function buatDomino() {
+            dominoes = [];
+            for (let i = 0; i <= 6; i++) {
+                for (let j = i; j <= 6; j++) {
+                    dominoes.push({
+                        atas: i,
+                        bawah: j,
+                        isRotated: false
+                    });
+                }
+            }
+        }
+
+        function kocokDomino() {
+            for (let i = dominoes.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [dominoes[i], dominoes[j]] = [dominoes[j], dominoes[i]];
+            }
+        }
+
+        function agihDomino() {
+            for (let i = 1; i <= 4; i++) {
+                players[i] = dominoes.slice((i-1)*7, i*7);
+            }
+            dominoes = dominoes.slice(28);
+        }
+
+        function putarDomino(index, event) {
+            event.stopPropagation();
+            if (currentPlayer === 1) {
+                players[1][index].isRotated = !players[1][index].isRotated;
+                let temp = players[1][index].atas;
+                players[1][index].atas = players[1][index].bawah;
+                players[1][index].bawah = temp;
+                updatePaparan();
+            }
+        }
+
+        function tunjukDomino(domino, index) {
+            return `
+                <div class="domino" onclick="mainDomino(${index})">
+                    <div class="domino-number">${domino.atas}</div>
+                    <div class="domino-number">${domino.bawah}</div>
+                    <button class="rotate-btn" onclick="putarDomino(${index}, event)">↻</button>
+                </div>
+            `;
+        }
+
+        function tunjukDominoAI(domino) {
+            return `
+                <div class="domino" style="background: #ccc">
+                    <div class="domino-number">?</div>
+                    <div class="domino-number">?</div>
+                </div>
+            `;
+        }
+
+        function updatePaparan() {
+            // Update tangan pemain manusia
+            document.getElementById('player1-hand').innerHTML = 
+                players[1].map((d, i) => tunjukDomino(d, i)).join('');
+            
+            // Update tangan AI
+            for (let i = 2; i <= 4; i++) {
+                document.getElementById(`player${i}-hand`).innerHTML = 
+                    players[i].map(tunjukDominoAI).join('');
+            }
+            
+            // Update papan permainan
+            document.getElementById('game-board').innerHTML = 
+                boardDominoes.map(d => tunjukDomino(d, -1)).join('');
+            
+            // Update status pemain aktif
+            for (let i = 1; i <= 4; i++) {
+                const playerInfo = document.getElementById(`player${i}-info`);
+                playerInfo.className = currentPlayer === i ? 'player-info active-player' : 'player-info';
+                playerInfo.textContent = `Pemain ${i}${i === 1 ? ' (Anda)' : ''} - ${players[i].length} domino`;
+            }
+
+            document.getElementById('status').textContent = 
+                currentPlayer === 1 ? 'Giliran anda!' : `Giliran Pemain ${currentPlayer}`;
+        }
+
+        function bolehMain(domino) {
+            if (boardDominoes.length === 0) return true;
+            
+            const firstDomino = boardDominoes[0];
+            const lastDomino = boardDominoes[boardDominoes.length - 1];
+            
+            return domino.atas === firstDomino.atas || 
+                   domino.atas === lastDomino.bawah || 
+                   domino.bawah === firstDomino.atas || 
+                   domino.bawah === lastDomino.bawah;
+        }
+
+        function mainDomino(index) {
+            if (currentPlayer !== 1) return;
+            
+            const domino = players[1][index];
+            if (bolehMain(domino)) {
+                players[1].splice(index, 1);
+                boardDominoes.push(domino);
+                nextPlayer();
+                updatePaparan();
+                
+                if (players[1].length === 0) {
+                    alert('Tahniah! Anda Menang!');
+                    return;
+                }
+                
+                if (currentPlayer !== 1) {
+                    setTimeout(giliranAI, 1000);
+                }
+            } else {
+                alert('Domino ini tidak boleh dimainkan! Cuba putar domino atau pilih domino lain.');
+            }
+        }
+
+        function nextPlayer() {
+            currentPlayer = currentPlayer % 4 + 1;
+        }
+
+        function giliranAI() {
+            const currentHand = players[currentPlayer];
+            let mainedDomino = false;
+
+            for (let i = 0; i < currentHand.length; i++) {
+                if (bolehMain(currentHand[i])) {
+                    const domino = currentHand[i];
+                    currentHand.splice(i, 1);
+                    boardDominoes.push(domino);
+                    mainedDomino = true;
+                    break;
+                }
+            }
+
+            if (currentHand.length === 0) {
+                alert(`Pemain ${currentPlayer} Menang!`);
+                return;
+            }
+
+            nextPlayer();
+            updatePaparan();
+
+            if (currentPlayer !== 1) {
+                setTimeout(giliranAI, 1000);
+            }
+        }
+
+        function mulaPemainan() {
+            buatDomino();
+            kocokDomino();
+            agihDomino();
+            boardDominoes = [];
+            currentPlayer = 1;
+            updatePaparan();
+        }
+    </script>
+</body>
+</html>
