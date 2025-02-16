@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Domino 4 Pemain</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="game-controls">
+            <button class="btn btn-new" onclick="mulaPemainan()">Permainan Baru</button>
+            <button class="btn btn-skip" onclick="skipGiliran()" id="skipBtn">Skip Giliran</button>
+        </div>
+
+        <div class="game-info">
+            <div class="status-message" id="statusMessage">Sila mula permainan baru</div>
+            <div class="score-display">
+                <div class="score-item">
+                    Skip: <span id="skipCount">0</span>
+                </div>
+                <div class="score-item">
+                    Giliran: <span id="currentTurn">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <div class="domino-container" id="boardDominoes"></div>
+        </div>
+
+        <div class="player-section" id="player1Section">
+            <div class="player-name">Pemain 1 (Anda)</div>
+            <div class="domino-container" id="player1Hand"></div>
+        </div>
+
+        <div class="player-section" id="player2Section">
+            <div class="player-name">Pemain 2</div>
+            <div class="domino-container" id="player2Hand"></div>
+        </div>
+
+        <div class="player-section" id="player3Section">
+            <div class="player-name">Pemain 3</div>
+            <div class="domino-container" id="player3Hand"></div>
+        </div>
+
+        <div class="player-section" id="player4Section">
+            <div class="player-name">Pemain 4</div>
+            <div class="domino-container" id="player4Hand"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
