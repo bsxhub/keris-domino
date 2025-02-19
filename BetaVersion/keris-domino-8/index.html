@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Domino 4 Pemain</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Tambah ini selepas tag body -->
+    <div class="toast" id="gameToast"></div>
+    <div class="modal" id="gameModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Pilih Posisi</h2>
+            <p id="modalMessage"></p>
+            <div class="modal-buttons">
+                <button class="btn btn-new" onclick="pilihPosisi('kiri')">Kiri</button>
+                <button class="btn btn-new" onclick="pilihPosisi('kanan')">Kanan</button>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Kandungan sedia ada -->
+    <div class="container">
+        <div class="score-display">
+            <div class="score-item">Pemain 1: <span id="player1Score">0</span></div>
+            <div class="score-item">Pemain 2: <span id="player2Score">0</span></div>
+            <div class="score-item">Pemain 3: <span id="player3Score">0</span></div>
+            <div class="score-item">Pemain 4: <span id="player4Score">0</span></div>
+        </div>
+        <div class="game-controls">
+            <button class="btn btn-new" onclick="mulaPemainan()">Permainan Baru</button>
+            <button class="btn btn-skip" onclick="skipGiliran()" id="skipBtn">Skip Giliran</button>
+            <button id="saveBtn" class="btn">Simpan</button>
+<button id="loadBtn" class="btn">Muat</button>
+<button id="soundBtn" class="btn">Bunyi</button>
+<button id="tutorialBtn" class="btn">Tutorial</button>
+        </div>
+
+        <div class="game-info">
+            <div class="status-message" id="statusMessage">Sila mula permainan baru</div>
+            <div class="score-display">
+                <div class="score-item">
+                    Skip: <span id="skipCount">0</span>
+                </div>
+                <div class="score-item">
+                    Giliran: <span id="currentTurn">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <div class="domino-container" id="boardDominoes"></div>
+        </div>
+
+        <div class="player-section" id="player1Section">
+            <div class="player-name">Pemain 1 (Anda)</div>
+            <div class="domino-container" id="player1Hand"></div>
+        </div>
+        
+        <div class="player-section" id="player2Section">
+            <div class="player-name">Pemain 2</div>
+            <div class="domino-container" id="player2Hand"></div>
+        </div>
+
+        <div class="player-section" id="player3Section">
+            <div class="player-name">Pemain 3</div>
+            <div class="domino-container" id="player3Hand"></div>
+        </div>
+
+        <div class="player-section" id="player4Section">
+            <div class="player-name">Pemain 4</div>
+            <div class="domino-container" id="player4Hand"></div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Domino Game. All Rights Reserved.</p>
+            <p>Developed by <a href="#" class="developer-link">bsd</a></p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <span class="separator">|</span>
+                <a href="#" class="footer-link">Terms of Use</a>
+                <span class="separator">|</span>
+                <a href="#" class="footer-link">Contact</a>
+            </div>
+            <div class="version-info">
+                Version BETA 8.0.0
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
