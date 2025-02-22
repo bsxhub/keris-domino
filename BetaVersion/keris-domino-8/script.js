@@ -12,7 +12,68 @@ let gameActive = false;
 let skipCount = 0;
 let selectedDominoIndex = -1;
 // Tambah di bahagian atas file, selepas variables global sedia ada
+// Dalam script.js
 
+class SoundManager {
+    constructor() {
+        this.context = new (window.AudioContext || window.webkitAudioContext)();
+        this.sounds = {};
+        this.enabled = true;
+    }
+
+    async loadSound(name, url) {
+        try {
+            const response = await fetch(url);
+            const arrayBuffer = await response.arrayBuffer();
+            const audioBuffer = await this.context.decodeAudioData(arrayBuffer);
+            this.sounds[name] = audioBuffer;
+        } catch (error) {
+            console.error(`Error loading sound ${name}:`, error);
+        }
+    }
+
+    playSound(name) {
+        if (!this.enabled || !this.sounds[name]) return;
+
+        const source = this.context.createBufferSource();
+        source.buffer = this.sounds[name];
+        source.connect(this.context.destination);
+        source.start(0);
+    }
+
+    toggle() {
+        this.enabled = !this.enabled;
+        return this.enabled;
+    }
+}
+
+// Inisialisasi Sound Manager
+const soundManager = new SoundManager();
+
+// Load sounds selepas interaksi pengguna
+async function initSounds() {
+    await soundManager.loadSound('play', 'sounds/play.mp3');
+    await soundManager.loadSound('rotate', 'sounds/rotate.mp3');
+    await soundManager.loadSound('win', 'sounds/win.mp3');
+    await soundManager.loadSound('error', 'sounds/error.mp3');
+}
+
+// Guna dalam permainan
+function playGameSound(name) {
+    soundManager.playSound(name);
+}
+
+// Butang toggle sound
+function toggleSound() {
+    const isEnabled = soundManager.toggle();
+    showToast(isEnabled ? 'Bunyi dihidupkan 🔊' : 'Bunyi dimatikan 🔇', 'info');
+}
+
+// Initialize sounds selepas interaksi pengguna
+document.addEventListener('click', function initializeAudio() {
+    initSounds();
+    document.removeEventListener('click', initializeAudio);
+}, { once: true });
 // Sound Effects
 const sounds = {
     playDomino: new Audio('sounds/play.mp3'), //Sound Effect by <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=144751">Universfield</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=144751">Pixabay</a>
