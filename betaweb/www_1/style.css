@@ -1,0 +1,37 @@
+.main-header {
+    background: #ffffff;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.main-nav ul {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+}
+
+.main-nav a {
+    color: #2E3192;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.hero-section {
+    background: linear-gradient(45deg, #2E3192, #E31E24);
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+}
+@media (max-width: 768px) {
+    .main-nav {
+        display: none;
+    }
+    
+    .mobile-menu {
+        display: block;
+    }
+    
+    .hero-section {
+        padding: 50px 20px;
+    }
+}
